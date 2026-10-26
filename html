@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디스크에서의 해방: 자세 교정 경고 시스템</title>
+
+    <!-- TensorFlow.js 및 Teachable Machine Image 라이브러리 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.3/dist/teachablemachine-image.min.js"></script>
+
+    <!-- 외부 CSS 파일 연결 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>디스크에서의 해방: 자세 교정 경고 시스템</h1>
+        <p>AI 웹캠 분석을 통해 올바른 자세를 유지하고 디스크 질환을 예방하세요.</p>
+    </header>
+
+    <div class="grid-container">
+        <!-- 1. AI 모델 및 설정 -->
+        <div class="card">
+            <h2>1. AI 모델 설정</h2>
+            <div class="input-group">
+                <label for="model-url">Teachable Machine URL</label>
+                <input type="text" id="model-url" placeholder="https://teachablemachine.withgoogle.com/models/..." value="">
+            </div>
+            <button id="btn-load-model" onclick="loadModel()">모델 불러오기</button>
+            <div id="model-status" style="margin-top: 8px; font-size: 0.85rem; color: #64748b;">모델 미로드</div>
+
+            <div class="input-group" style="margin-top: 15px;">
+                <label for="threshold">인식 신뢰도 기준 (%)</label>
+                <input type="number" id="threshold" value="80" min="50" max="100">
+            </div>
+        </div>
+
+        <!-- 2. 마이크로비트 연결 -->
+        <div class="card">
+            <h2>2. 마이크로비트 연결</h2>
+            <p style="font-size: 0.85rem; margin-bottom: 10px;">연결 상태: <span id="serial-status" class="status-badge">연결 안됨</span></p>
+            <button id="btn-connect" onclick="connectSerial()">마이크로비트 USB 연결</button>
+            <button id="btn-disconnect" class="btn-danger" onclick="disconnectSerial()" style="display:none;">연결 해제</button>
+            
+            <div style="margin-top: 15px;">
+                <label style="font-size: 0.85rem; font-weight: 600;">수동 테스트 전송</label>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <button class="btn-success" onclick="sendSerial('right\n')">right 전송</button>
+                    <button class="btn-danger" onclick="sendSerial('wrong\n')">wrong 전송</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 입력 방식 및 카메라 -->
+        <div class="card">
+            <h2>3. 자세 분석 실행</h2>
+            <div class="input-group">
+                <label for="input-mode">입력 방식 선택</label>
+                <select id="input-mode" onchange="switchInputMode()">
+                    <option value="camera">실시간 카메라</option>
+                    <option value="image">이미지 파일 업로드</option>
+                </select>
+            </div>
+
+            <!-- 카메라 섹션 -->
+            <div id="camera-section">
+                <div id="webcam-container">
+                    <span style="color: #94a3b8;">카메라가 꺼져 있습니다.</span>
+                </div>
+                <button id="btn-toggle-cam" onclick="toggleCamera()" style="margin-top: 10px;">카메라 시작</button>
+            </div>
+
+            <!-- 이미지 업로드 섹션 -->
+            <div id="image-section" style="display: none;">
+                <div id="image-container">
+                    <img id="uploaded-image" src="" alt="업로드 이미지" style="display: none;">
+                    <span id="img-placeholder" style="color: #94a3b8;">이미지를 선택해주세요.</span>
+                </div>
+                <input type="file" id="file-input" accept="image/*" onchange="handleImageUpload(event)" style="margin-top: 10px;">
+                <button onclick="predictUploadedImage()" style="margin-top: 5px;">이미지 분석하기</button>
+            </div>
+        </div>
+
+        <!-- 4. 분석 결과 및 기록 -->
+        <div class="card">
+            <h2>4. AI 판단 결과</h2>
+            <div id="result-display">대기 중...</div>
+            
+            <div id="label-container" class="prob-bar-container"></div>
+
+            <div style="margin-top: 15px;">
+                <label style="font-size: 0.85rem; font-weight: 600;">통신 및 시스템 로그</label>
+                <div id="log-box" class="log-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 외부 JS 파일 연결 -->
+    <script src="script.js"></script>
+</body>
+</html>
